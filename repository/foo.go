@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gofrs/uuid"
 	"gorm.io/gorm"
@@ -13,7 +12,6 @@ const fooTable = "foo"
 type Foo struct {
 	ID    uuid.UUID
 	Value string
-	Flag  bool
 }
 
 type fooRepo struct {
@@ -24,6 +22,12 @@ func NewFooRepo(db *gorm.DB) *fooRepo {
 	return &fooRepo{
 		db: db,
 	}
+}
+
+type IFoo interface {
+	GetFoo(id uuid.UUID) (*Foo, error)
+	CreateFoo(value string) (*Foo, error)
+	UpdateValue(id uuid.UUID, value string) (*Foo, error)
 }
 
 func (r *fooRepo) GetFoo(id uuid.UUID) (*Foo, error) {
@@ -45,7 +49,6 @@ func (r *fooRepo) CreateFoo(value string) (*Foo, error) {
 
 	err := r.db.Table(fooTable).Create(f).Error
 	if err != nil {
-		log.Println("Error creating", err)
 		return nil, err
 	}
 	return f, nil
@@ -62,26 +65,4 @@ func (r *fooRepo) UpdateValue(id uuid.UUID, value string) (*Foo, error) {
 		return nil, err
 	}
 	return f, nil
-}
-
-func (r *fooRepo) ActivateFlag(f *Foo) (*Foo, error) {
-	f.Flag = true
-
-	err := r.db.Table(fooTable).Save(f).Error
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
-}
-
-func (i *fooRepo) WithTx(tx *gorm.DB) *fooRepo {
-	if tx == nil {
-		return i
-	}
-	i.db = tx
-	return i
-}
-
-func (i *fooRepo) DB() *gorm.DB {
-	return i.db
 }
