@@ -1,0 +1,27 @@
+version: "3"
+services:
+  database:
+    image: postgres:10.12-alpine
+    ports:
+      - "127.0.0.1:5434:5432"
+    environment:
+      POSTGRES_USER: arexdb_dev
+      POSTGRES_PASSWORD: arexdb_dev
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: test_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arexdb_dev -d test_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/database
+    command:
+      [ "-path", "/database", "-database",  "postgresql://arexdb_dev:arexdb_dev@database:5432/test_db?sslmode=disable", "up" ]

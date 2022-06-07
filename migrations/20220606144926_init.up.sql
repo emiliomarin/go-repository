@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS foo (
+    id UUID PRIMARY KEY,
+    value TEXT NOT NULL,
+    flag BOOLEAN
+);
+
+CREATE TABLE IF NOT EXISTS bar (
+    id UUID PRIMARY KEY,
+    value TEXT NOT NULL,
+    flag BOOLEAN
+);
