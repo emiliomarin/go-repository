@@ -46,3 +46,24 @@ func (o *DBOptions) connection() string {
 		o.SSLMode,
 	)
 }
+
+// type Tx struct {
+// 	tx *gorm.DB
+// }
+
+// func NewTx(db *gorm.DB) Tx {
+// 	return Tx{tx: db}
+// }
+
+// func (t Tx) Begin() *gorm.DB {
+// 	return t.tx.Begin()
+// }
+
+// func (t Tx) Commit() error {
+// 	log.Println(t.tx)
+// 	return t.tx.Commit().Error
+// }
+
+// func (t Tx) Rollback() error {
+// 	return t.tx.Rollback().Error
+// }
