@@ -24,14 +24,14 @@ func TestUnitOfWork(t *testing.T) {
 	var fooID, barID uuid.UUID
 
 	t.Run("Using a unit of work block on success", func(t *testing.T) {
-		err = uow.Do(func(uows repository.UnitOfWorkStore) error {
-			foo, err := uows.Foo().CreateFoo(initialValue)
+		err = uow.Do(func(uows *repository.UnitOfWorkStore) error {
+			foo, err := uows.Foo.CreateFoo(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			fooID = foo.ID
-			getFoo, err := uows.Foo().GetFoo(foo.ID)
+			getFoo, err := uows.Foo.GetFoo(foo.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -39,7 +39,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, getFoo.ID, foo.ID, "should have the same ID")
 			assert.Equal(t, getFoo.Value, foo.Value, "should have the same value")
 
-			updatedFoo, err := uows.Foo().UpdateValue(foo.ID, updatedValue)
+			updatedFoo, err := uows.Foo.UpdateValue(foo.ID, updatedValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -66,15 +66,15 @@ func TestUnitOfWork(t *testing.T) {
 	})
 
 	t.Run("Rollback on error", func(t *testing.T) {
-		err = uow.Do(func(uows repository.UnitOfWorkStore) error {
-			foo, err := uows.Foo().CreateFoo(initialValue)
+		err = uow.Do(func(uows *repository.UnitOfWorkStore) error {
+			foo, err := uows.Foo.CreateFoo(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			fooID = foo.ID
 
-			getFoo, err := uows.Foo().GetFoo(foo.ID)
+			getFoo, err := uows.Foo.GetFoo(foo.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -82,7 +82,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, getFoo.ID, foo.ID, "should have the same ID")
 			assert.Equal(t, getFoo.Value, foo.Value, "should have the same value")
 
-			updatedFoo, err := uows.Foo().UpdateValue(foo.ID, updatedValue)
+			updatedFoo, err := uows.Foo.UpdateValue(foo.ID, updatedValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -100,22 +100,22 @@ func TestUnitOfWork(t *testing.T) {
 	})
 
 	t.Run("Multiple repos success", func(t *testing.T) {
-		err = uow.Do(func(uows repository.UnitOfWorkStore) error {
-			foo, err := uows.Foo().CreateFoo(initialValue)
+		err = uow.Do(func(uows *repository.UnitOfWorkStore) error {
+			foo, err := uows.Foo.CreateFoo(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			fooID = foo.ID
 
-			bar, err := uows.Bar().CreateBar(initialValue)
+			bar, err := uows.Bar.CreateBar(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			barID = bar.ID
 
-			getFoo, err := uows.Foo().GetFoo(foo.ID)
+			getFoo, err := uows.Foo.GetFoo(foo.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -123,7 +123,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, getFoo.ID, foo.ID, "should have the same ID")
 			assert.Equal(t, getFoo.Value, foo.Value, "should have the same value")
 
-			getBar, err := uows.Bar().GetBar(bar.ID)
+			getBar, err := uows.Bar.GetBar(bar.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -131,7 +131,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, getBar.ID, bar.ID, "should have the same ID")
 			assert.Equal(t, getBar.Value, bar.Value, "should have the same value")
 
-			updatedFoo, err := uows.Foo().UpdateValue(foo.ID, updatedValue)
+			updatedFoo, err := uows.Foo.UpdateValue(foo.ID, updatedValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -139,7 +139,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, updatedFoo.ID, foo.ID, "should have the same ID")
 			assert.Equal(t, updatedFoo.Value, updatedValue, "should have updated the value")
 
-			updatedBar, err := uows.Bar().UpdateValue(bar.ID, updatedValue)
+			updatedBar, err := uows.Bar.UpdateValue(bar.ID, updatedValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -168,22 +168,22 @@ func TestUnitOfWork(t *testing.T) {
 	})
 
 	t.Run("Multiple repos rollback", func(t *testing.T) {
-		err = uow.Do(func(uows repository.UnitOfWorkStore) error {
-			foo, err := uows.Foo().CreateFoo(initialValue)
+		err = uow.Do(func(uows *repository.UnitOfWorkStore) error {
+			foo, err := uows.Foo.CreateFoo(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			fooID = foo.ID
 
-			bar, err := uows.Bar().CreateBar(initialValue)
+			bar, err := uows.Bar.CreateBar(initialValue)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
 			}
 			barID = bar.ID
 
-			getFoo, err := uows.Foo().GetFoo(foo.ID)
+			getFoo, err := uows.Foo.GetFoo(foo.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
@@ -191,7 +191,7 @@ func TestUnitOfWork(t *testing.T) {
 			assert.Equal(t, getFoo.ID, foo.ID, "should have the same ID")
 			assert.Equal(t, getFoo.Value, foo.Value, "should have the same value")
 
-			getBar, err := uows.Bar().GetBar(bar.ID)
+			getBar, err := uows.Bar.GetBar(bar.ID)
 			if err != nil {
 				assert.Nil(t, err)
 				return err
